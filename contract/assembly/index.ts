@@ -22,6 +22,7 @@ const DEFAULT_MESSAGE = 'Hello'
 class Ganado {
   id: u32;
   fecha_nacimiento: string;
+  
   ubicacion: string;
   propietario: u16;
   estado: u16;
