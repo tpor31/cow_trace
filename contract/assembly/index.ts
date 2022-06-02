@@ -12,9 +12,41 @@
  *
  */
 
-import { Context, logging, storage } from 'near-sdk-as'
+import { Context, logging, storage, PersistentUnorderedMap, context } from 'near-sdk-as'
+
+
 
 const DEFAULT_MESSAGE = 'Hello'
+
+@nearBindgen
+class Ganado {
+  id: u32;
+  fecha_nacimiento: string;
+  ubicacion: string;
+  propietario: u16;
+  estado: u16;
+
+  constructor(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
+    this.id=id;
+    this.fecha_nacimiento=fecha_nacimiento;
+    this.ubicacion=ubicacion;
+    this.propietario=propietario;
+    this.estado=estado;
+  }
+}
+
+const ganados = new PersistentUnorderedMap<String, Ganado>("c");
+
+export function setGanado(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
+
+  const cuenta = context.sender;
+  let crette = new Ganado(id, fecha_nacimiento, ubicacion, propietario, estado)
+
+  ganados.set(cuenta, crette)
+
+}
+
+
 
 // Exported functions will be part of the public interface for your smart contract.
 // Feel free to extract behavior to non-exported functions!
