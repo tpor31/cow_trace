@@ -12,35 +12,22 @@
  *
  */
 
-import { Context, logging, storage, PersistentUnorderedMap, context } from 'near-sdk-as'
+import { Context, logging, storage, PersistentUnorderedMap, context, PersistentVector } from 'near-sdk-as'
+import { Ganado, Estado, ganados } from './model';
 
 
 
 const DEFAULT_MESSAGE = 'Hello'
 
-@nearBindgen
-class Ganado {
-  id: u32;
-  fecha_nacimiento: string;
-  
-  ubicacion: string;
-  propietario: u16;
-  estado: u16;
 
-  constructor(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
-    this.id=id;
-    this.fecha_nacimiento=fecha_nacimiento;
-    this.ubicacion=ubicacion;
-    this.propietario=propietario;
-    this.estado=estado;
-  }
-}
 
-const ganados = new PersistentUnorderedMap<String, Ganado>("c");
-
-export function setGanado(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
+ 
+export function setGanado(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, e: string){
 
   const cuenta = context.sender;
+  let estado = new Estado(e);
+  //si existe el animal recuperar los estados para agregar este nuevo
+  //sino agregar este
   let crette = new Ganado(id, fecha_nacimiento, ubicacion, propietario, estado)
 
   ganados.set(cuenta, crette)
@@ -51,13 +38,17 @@ export function setGanado(id: u32, fecha_nacimiento: string, ubicacion: string, 
 
 // Exported functions will be part of the public interface for your smart contract.
 // Feel free to extract behavior to non-exported functions!
-export function getGreeting(accountId: string): string | null {
+export function getGanado(idGanado: string) {
+
   // This uses raw `storage.get`, a low-level way to interact with on-chain
   // storage for simple contracts.
   // If you have something more complex, check out persistent collections:
   // https://docs.near.org/docs/concepts/data-storage#assemblyscript-collection-types
-  return storage.get<string>(accountId, DEFAULT_MESSAGE)
+  
+  return ganados.get(idGanado);
 }
+
+export function getGanadosPorCuenta(cuenta: String){}
 
 export function setGreeting(message: string): void {
   const accountId = Context.sender
