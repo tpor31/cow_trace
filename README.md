@@ -96,8 +96,16 @@ Los siguientes comandos le permiten interactuar con el contrato inteligente.
 
 ```near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>```
 
+3. Consultar el estado de un ganado. 
+   Se debe tener el id del ganado registrado previamente
 
+``` near view $CONTRATO consultarEstados '{"idGanado":"id"}' --accountId <su cuenta test> ```
 
+4. Actualizar estado.
+   Este metodo agrega un nuevo estado en la trazabilidad del animal
+   
+```  near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripcion", "responsable":"responsable","ubicacion":"ubicacion"}' --accountId <su cuenta test>```
+```
 
 Mockup interfaz grafica
 ===============
