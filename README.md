@@ -34,39 +34,53 @@ Paso 1. Prerequisitos
 4. Tener instalado el near cli global
    yarn install --global near-cli
 
-Paso 2: Crear cuenta para el contrato
--------------------------------------
+## Uso
 
+### Compilando y desplegando
 
+Lo primero que debemos hacer es instalar las dependencias necesarias para que el proyecto funcione.
 
-Desplegar el contrato
-======
+```sh
+npm install
+```
 
-Every smart contract in NEAR has its [own associated account][NEAR accounts]. When you run `yarn dev`, your smart contract gets deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
+ó
 
+```sh
+yarn install
+```
 
+Una vez hecho esto, podemos compilar el código.
 
+```sh
+npm run build
+```
 
-Step 1: Create an account for the contract
-------------------------------------------
+ó
 
-Each account on NEAR can have at most one contract deployed to it. If you've already created an account such as `your-name.testnet`, you can deploy your contract to `cow_trace.your-name.testnet`. Assuming you've already created an account on [NEAR Wallet], here's how to create `cow_trace.your-name.testnet`:
+```sh
+yarn build
+```
 
-1. Authorize NEAR CLI, following the commands it gives you:
+El contrato compilado en WebAssembly se guarda en la carpeta `AssemblyScript/build/release/`. Ahora solo es necesario desplegarlo en una cuenta de desarrollo.
 
-      near login
+```sh
+near dev-deploy build/release/contrato.wasm
+```
 
-2. Create a subaccount (replace `YOUR-NAME` below with your actual account name):
+### Usando variables de entorno
 
-      near create-account cow_trace.YOUR-NAME.testnet --masterAccount YOUR-NAME.testnet
+Una vez compilado y desplegado tu proyecto, vamos a requerir identificar la cuenta neardev. Esta la puedes encontrar en el archivo `AssemblyScript/neardev/neardev`. Podemos almacenar este contrato en una variable de entorno ejecutando lo siguiente en la consola, y sustituyendo por tu cuenta de desarrollo:
 
+```sh
+export CONTRATO=dev-0000000000000-000000000
+```
 
-Step 2: set contract name in code
----------------------------------
+Haciendo esto, podemos comprobar que la variable `CONTRATO` tiene almacenada nuestra cuenta dev.
 
-Modify the line in `src/config.js` that sets the account name of the contract. Set it to the account id you used above.
-
-    const CONTRACT_NAME = process.env.CONTRACT_NAME || 'cow_trace.YOUR-NAME.testnet'
+```sh
+echo $CONTRATO
+```
 
 
 Paso 3: Metodos
@@ -76,11 +90,11 @@ Los siguientes comandos le permiten interactuar con el contrato inteligente.
 
 1. Registrar un ganado en la blockchain
 
-`near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>`
+```near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>```
 
 2. Consultar el ganado que registro
 
-`near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>`
+```near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>```
 
 
 
