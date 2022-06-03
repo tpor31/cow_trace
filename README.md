@@ -21,12 +21,12 @@ Las funciones que permitira hacer el smart contract son las siguientes
 7. comprarGanado
 
 
-Instalacion
+1 Instalacion
 ===========
 
 Para ejecutar el proyecto local, se deben seguir los siguientes pasos:
 
-Paso 1. Prerequisitos
+Prerequisitos
 
 1. [Node,js] >= 12
 2. instalar dependencias: npm install o yarn install
@@ -34,9 +34,8 @@ Paso 1. Prerequisitos
 4. Tener instalado el near cli global
    yarn install --global near-cli
 
-## Uso
 
-### Compilando y desplegando
+### 2 Compilando y desplegando
 
 Lo primero que debemos hacer es instalar las dependencias necesarias para que el proyecto funcione.
 
@@ -68,7 +67,7 @@ El contrato compilado en WebAssembly se guarda en la carpeta `AssemblyScript/bui
 near dev-deploy build/release/contrato.wasm
 ```
 
-### Usando variables de entorno
+### 2.1 Usando variables de entorno
 
 Una vez compilado y desplegado tu proyecto, vamos a requerir identificar la cuenta neardev. Esta la puedes encontrar en el archivo `AssemblyScript/neardev/neardev`. Podemos almacenar este contrato en una variable de entorno ejecutando lo siguiente en la consola, y sustituyendo por tu cuenta de desarrollo:
 
@@ -115,7 +114,7 @@ near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripci
 ```
 
 
-Mockup interfaz grafica
+### 4 Mockup interfaz grafica
 ===============
 
 Poner aca el mockup de la interfaz grafica
