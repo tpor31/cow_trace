@@ -55,7 +55,7 @@ it("Requiere que la ubicacion no sea vacia.", () => {
 
   
 
-describe("actualizar estado ", () => {
+describe("actualizar estado", () => {
     it("Requiere que exista un ganado con el id", () => {
         setContext();
       expect(() => {
