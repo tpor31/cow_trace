@@ -21,7 +21,7 @@ export function registrarGanado(ubicacion: string, genero: string, raza: string,
 
   assert(tamano != "", "El tamaño no puede estar vacío.");
 
-  assert(precio != 0, "El precio no puede ser 0.");
+  assert(precio > 0, "El precio no puede ser 0.");
 
   //Creamos un objeto de tipo Ganado. Puedes validar el modelo en /models/model.ts
   let ganado = new Ganado(ubicacion, context.sender, genero, raza, tamano, precio);
@@ -40,7 +40,7 @@ export function registrarGanado(ubicacion: string, genero: string, raza: string,
       + '" con ubicacion en "'
       + ubicacion
       + '" con un precio de "'
-      + precio
+      + precio.toString()
       + '"'
   )
 
@@ -51,6 +51,8 @@ export function registrarGanado(ubicacion: string, genero: string, raza: string,
   
   //Llamamos a la función encargada de registrar añadir el registro del nuevo usuario en la colección de usuarios 
   registrarUsuario(context.sender, ganado.id);
+
+  actualizarEstado(ganado.id, "recien nacido", context.sender, ubicacion);
 
   //Regresamos el ganado
   return ganado
@@ -67,7 +69,7 @@ export function registrarUsuario(idCuenta: string, idGanado: string): void{
   usuarios.set(idCuenta, usuario);
 }
 
-export function actualizarEstado(idGanado: string, descripcion: string, responsable: string, ubicacion: string): void{
+export function actualizarEstado(idGanado: string, descripcion: string, responsable: string, ubicacion: string): Estado | null{
 
   //Validando inputs
   assert(idGanado != "", "El id no debe estar vacío.");
@@ -75,17 +77,24 @@ export function actualizarEstado(idGanado: string, descripcion: string, responsa
   //Y consultamos la tanda para poder invocar sus métodos
   const ganado = ganados.get(idGanado);
 
+  assert(ganado, `El ganado ${idGanado} no existe`);
+
   //El id de la cuenta será quien invoca el método
   const accountId = context.sender
 
-  assert(accountId == ganado?.criador, "No eres el dueño de este ganado.");
+  if(ganado){
 
+  assert(accountId == ganado.criador, "No eres el dueño de este ganado.");
+  
   //Creamos un nuevo objeto de tipo estado.
   const estado = new Estado(descripcion,responsable,ubicacion);
 
-  if (ganado){
-    ganado.agregarEstado(estado);
+  ganado.agregarEstado(estado);
+
+  return estado;
+
   }
+  return null;
 
 }
 
@@ -125,7 +134,7 @@ export function consultarGanado(idGanado: string): Ganado | null {
 
 export function consultarGanadoRegistrado(idCuenta: string = context.sender): Array<Ganado | null> | null{
   const usuario = usuarios.get(idCuenta);
-  
+  assert(usuario,"No tienes ganado registrado.");
   return usuario ? buscarGanado(usuario.ganadoRegistrado) : null
 }
 
@@ -163,7 +172,10 @@ export function comprarGanado(idGanado:string): void {
   let vendedor = usuarios.get(ganado.criador);
 
     if(vendedor){
-      const registroActualizado = vendedor.ganadoRegistrado.filter(item => item !== idGanado);
+
+      const index = vendedor.ganadoRegistrado.indexOf(idGanado);
+
+      const registroActualizado = vendedor.ganadoRegistrado.splice(index,1);
 
       vendedor.ganadoRegistrado = registroActualizado;
 
@@ -176,7 +188,7 @@ export function comprarGanado(idGanado:string): void {
       registrarUsuario(cuenta, idGanado);
 
       logging.log(`Compra relizada con exito. El vendedor ha recibido supago de ${ganado.precio} NEAR.`);
-      
+
    }
 
   }
