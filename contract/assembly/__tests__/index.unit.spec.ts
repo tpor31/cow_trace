@@ -44,3 +44,10 @@ it("Requiere que la ubicacion no sea vacia.", () => {
       contrato.registrarGanado("", GENERO, RAZA, TAMANO, PRECIO);
     }).toThrow("La ubicacion no puede ser vacia.");
   })
+
+  it("Requiere que la raza no sea vacia.", () => {
+    setContext();
+    expect(() => {
+      contrato.registrarGanado(UBICACION, GENERO, "", TAMANO, PRECIO);
+    }).toThrow("La raza no puede ser vacia.");
+  })
