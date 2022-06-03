@@ -14,7 +14,7 @@ export function registrarGanado(ubicacion: string, genero: string, raza: string,
    * desde el inicio se tenga asignado el nombre.
    */
   assert(ubicacion != "", "La ubicacion no puede estar vacío.");
-
+  
   assert(genero != "", "El genero puede estar vacío.");
 
   assert(raza != "", "La raza no puede estar vacío.");
@@ -145,7 +145,7 @@ export function consultarGanadoRegistrado(idCuenta: string = context.sender): Ar
  */
 export function buscarGanado(listaGanado: Array<string>): Array<Ganado | null> | null{
   let result = new Array<Ganado | null>();
-
+  
   for (let i = 0; i < listaGanado.length; i++) {
     result.push(ganados.get(listaGanado[i]));
   }
@@ -192,6 +192,6 @@ export function comprarGanado(idGanado:string): void {
    }
 
   }
-  
+
 }
 
