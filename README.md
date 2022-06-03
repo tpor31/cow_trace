@@ -125,4 +125,5 @@ near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripci
 ### 5 Mockup interfaz grafica
 ===============
 
-Poner aca el mockup de la interfaz grafica
+
+https://docs.google.com/presentation/d/15CG_UGXPMSCpc9r2ExBDVibX9pCPzhPxzKSbEJhsL-8/edit?usp=sharing
