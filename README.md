@@ -90,22 +90,30 @@ Los siguientes comandos le permiten interactuar con el contrato inteligente.
 
 1. Registrar un ganado en la blockchain
 
-```near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>```
+```sh
+near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>
+```
 
 2. Consultar el ganado que registro
 
-```near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>```
+```sh
+near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>
+```
 
 3. Consultar el estado de un ganado. 
    Se debe tener el id del ganado registrado previamente
 
-``` near view $CONTRATO consultarEstados '{"idGanado":"id"}' --accountId <su cuenta test> ```
+```sh
+near view $CONTRATO consultarEstados '{"idGanado":"id"}' --accountId <su cuenta test>
+```
 
 4. Actualizar estado.
    Este metodo agrega un nuevo estado en la trazabilidad del animal
    
-```  near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripcion", "responsable":"responsable","ubicacion":"ubicacion"}' --accountId <su cuenta test>```
+```sh
+near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripcion", "responsable":"responsable","ubicacion":"ubicacion"}' --accountId <su cuenta test>
 ```
+
 
 Mockup interfaz grafica
 ===============
