@@ -76,7 +76,11 @@ Los siguientes comandos le permiten interactuar con el contrato inteligente.
 
 1. Registrar un ganado en la blockchain
 
-near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>
+`near call $CONTRATO registrarGanado '{"ubicacion":"ubicacion", "genero":"genero", "raza":"raza","tamano":"tamano", "precio":"1"}' --accountId <su cuenta test>`
+
+2. Consultar el ganado que registro
+
+`near view $CONTRATO consultarGanadoRegistrado '{"idCuenta": "su_cuenta_test"}' --accountId <su cuenta test>`
 
 
 
