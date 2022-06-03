@@ -1,67 +1,185 @@
-/*
- * This is an example of an AssemblyScript smart contract with two simple,
- * symmetric functions:
- *
- * 1. setGreeting: accepts a greeting, such as "howdy", and records it for the
- *    user (account_id) who sent the request
- * 2. getGreeting: accepts an account_id and returns the greeting saved for it,
- *    defaulting to "Hello"
- *
- * Learn more about writing NEAR smart contracts with AssemblyScript:
- * https://docs.near.org/docs/develop/contracts/as/intro
- *
- */
+import { context, logging, storage , PersistentUnorderedMap, datetime, u128, ContractPromiseBatch, Context} from 'near-sdk-as'
+import { ganados ,Ganado, Estado, keys, usuarios, Usuario} from "../models/model"
 
-import { Context, logging, storage, PersistentUnorderedMap, context } from 'near-sdk-as'
+const ONE_NEAR = u128.from('1000000000000000000000000');
 
 
 
-const DEFAULT_MESSAGE = 'Hello'
+export function registrarGanado(ubicacion: string, genero: string, raza: string, tamano : string, precio: u64 = 0): Ganado{
 
-@nearBindgen
-class Ganado {
-  id: u32;
-  fecha_nacimiento: string;
+  //Validamos que los parámetros enviados sean correctos
+
+  /* Tecnicamente podría ir vacío, no hay ningún método que requiera el nombre.
+   * Sin embargo, dado a que esto será mostrado al usuario, es mejor que 
+   * desde el inicio se tenga asignado el nombre.
+   */
+  assert(ubicacion != "", "La ubicacion no puede estar vacío.");
+
+  assert(genero != "", "El genero puede estar vacío.");
+
+  assert(raza != "", "La raza no puede estar vacío.");
+
+  assert(tamano != "", "El tamaño no puede estar vacío.");
+
+  assert(precio != 0, "El precio no puede ser 0.");
+
+  //Creamos un objeto de tipo Ganado. Puedes validar el modelo en /models/model.ts
+  let ganado = new Ganado(ubicacion, context.sender, genero, raza, tamano, precio);
+
+  //Este mensaje va a regresarlo la consola si todo es exitoso.
+  //También se mostrará en la blockchain.
+  logging.log(
+    'Creando registro de ganado "' 
+      + raza
+      + '" en la cuenta "' 
+      + context.sender
+      + '" genero "'
+      + genero
+      + '", tamaño "'
+      + tamano
+      + '" con ubicacion en "'
+      + ubicacion
+      + '" con un precio de "'
+      + precio
+      + '"'
+  )
+
+  //Envíamos el objeto creado al mapa de Ganado.
+  ganados.set(ganado.id, ganado);
+  //Y la clave al arreglo de Ganado.
+  keys.push(ganado.id);
   
-  ubicacion: string;
-  propietario: u16;
-  estado: u16;
+  //Llamamos a la función encargada de registrar añadir el registro del nuevo usuario en la colección de usuarios 
+  registrarUsuario(context.sender, ganado.id);
 
-  constructor(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
-    this.id=id;
-    this.fecha_nacimiento=fecha_nacimiento;
-    this.ubicacion=ubicacion;
-    this.propietario=propietario;
-    this.estado=estado;
-  }
+  //Regresamos el ganado
+  return ganado
+
 }
 
-const ganados = new PersistentUnorderedMap<String, Ganado>("c");
+export function registrarUsuario(idCuenta: string, idGanado: string): void{
 
-export function setGanado(id: u32, fecha_nacimiento: string, ubicacion: string, propietario: u16, estado: u16){
+  let usuario = usuarios.get(idCuenta);
+  if (!usuario){
+    usuario = new Usuario(idCuenta);
+  }
+  usuario.ganadoRegistrado.push(idGanado);
+  usuarios.set(idCuenta, usuario);
+}
+
+export function actualizarEstado(idGanado: string, descripcion: string, responsable: string, ubicacion: string): void{
+
+  //Validando inputs
+  assert(idGanado != "", "El id no debe estar vacío.");
+
+  //Y consultamos la tanda para poder invocar sus métodos
+  const ganado = ganados.get(idGanado);
+
+  //El id de la cuenta será quien invoca el método
+  const accountId = context.sender
+
+  assert(accountId == ganado?.criador, "No eres el dueño de este ganado.");
+
+  //Creamos un nuevo objeto de tipo estado.
+  const estado = new Estado(descripcion,responsable,ubicacion);
+
+  if (ganado){
+    ganado.agregarEstado(estado);
+  }
+
+}
+
+export function consultarEstados(idGanado: string): Array<Estado> | null {
+
+  //Validamos inputs
+  assert(idGanado != "", "El campo de clave no debe estar vacío.");
+
+  //Obtenemos el Ganado y validamos su existencia
+  const ganado = ganados.get(idGanado);
+  assert(ganado, `El ganado ${idGanado} no existe`);
+
+  if (ganado){
+    //Guardamos la lista de tipo Estado en una variable
+    const estados = ganado.consultarEstados();
+  
+    //Y creamos el objeto que vamos a regresar, un arreglo dinámico.
+    const result = new Array<Estado>();
+
+    //Ahora, ciclaremos por la lista de Estados
+    for(let i = 0; i < estados.length; i++) {
+      //Y vamos a regresar todo el objeto, por lo que lo guardamos en el resultado
+      result.push(estados[i]);
+    }
+    //Regresamos dicho resultado
+    return result;
+  }
+  //Si no existe el ganado solicitado
+  return null;
+}
+
+export function consultarGanado(idGanado: string): Ganado | null {
+  //Simplemente invocamos el error si el id está vacío
+  assert(idGanado != "","El campo de clave no debe estar vacío.");
+  return ganados.get(idGanado);
+}
+
+export function consultarGanadoRegistrado(idCuenta: string = context.sender): Array<Ganado | null> | null{
+  const usuario = usuarios.get(idCuenta);
+  
+  return usuario ? buscarGanado(usuario.ganadoRegistrado) : null
+}
+
+/**
+ * It takes an array of strings, and returns an array of Ganado objects or nulls.
+ * @param listaGanado - Array<string>
+ * @returns An array of Ganado or null.
+ */
+export function buscarGanado(listaGanado: Array<string>): Array<Ganado | null> | null{
+  let result = new Array<Ganado | null>();
+
+  for (let i = 0; i < listaGanado.length; i++) {
+    result.push(ganados.get(listaGanado[i]));
+  }
+  return result;
+}
+
+export function comprarGanado(idGanado:string): void {
+
+  assert(idGanado != "", "El id no debe estar vacío.");
 
   const cuenta = context.sender;
-  let crette = new Ganado(id, fecha_nacimiento, ubicacion, propietario, estado)
+  const deposito = context.attachedDeposit;
 
-  ganados.set(cuenta, crette)
+  let ganado = ganados.get(idGanado);
 
+  if(ganado){
+  assert(cuenta != ganado.criador, "Ya eres el dueño de este ganado.");
+
+  assert(deposito == u128.mul(ONE_NEAR, u128.from(ganado.precio)),
+  `Debes de pagar el valor completo de ${ganado.precio} NEAR.`);
+
+  ContractPromiseBatch.create(ganado.criador).transfer(deposito);
+
+  let vendedor = usuarios.get(ganado.criador);
+
+    if(vendedor){
+      const registroActualizado = vendedor.ganadoRegistrado.filter(item => item !== idGanado);
+
+      vendedor.ganadoRegistrado = registroActualizado;
+
+      ganado.criador = cuenta;
+
+      usuarios.set(vendedor.accountId,vendedor);
+
+      ganados.set(idGanado,ganado);
+
+      registrarUsuario(cuenta, idGanado);
+
+      logging.log(`Compra relizada con exito. El vendedor ha recibido supago de ${ganado.precio} NEAR.`);
+      
+   }
+
+  }
+  
 }
 
-
-
-// Exported functions will be part of the public interface for your smart contract.
-// Feel free to extract behavior to non-exported functions!
-export function getGreeting(accountId: string): string | null {
-  // This uses raw `storage.get`, a low-level way to interact with on-chain
-  // storage for simple contracts.
-  // If you have something more complex, check out persistent collections:
-  // https://docs.near.org/docs/concepts/data-storage#assemblyscript-collection-types
-  return storage.get<string>(accountId, DEFAULT_MESSAGE)
-}
-
-export function setGreeting(message: string): void {
-  const accountId = Context.sender
-  // Use logging.log to record logs permanently to the blockchain!
-  logging.log(`Saving greeting "${message}" for account "${accountId}"`)
-  storage.set(accountId, message)
-}
