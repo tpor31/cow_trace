@@ -1,15 +1,12 @@
 {
-  "name": "cow_trace",
+  "name": "greeter",
   "version": "0.0.1",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "watch -d -n 1 'clear && yarn test'",
-    "test": "yarn asp -f unit.spec",
-    "clean": "rm -rf ./build && rm -rf ./neardev",
-    "build": "asb --target debug",
-    "build:release": "asb",
-    "asp": "asp --verbose --nologo"
+    "build": "asb",
+    "build:debug": "asb --target debug",
+    "test": "asp --nologo"
   },
   "dependencies": {
     "near-sdk-as": "3.1.0"
