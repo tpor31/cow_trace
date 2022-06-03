@@ -5,14 +5,19 @@ const ONE_NEAR = u128.from('1000000000000000000000000');
 
 
 
+/**
+ * It creates a new Ganado object, adds it to the Ganado map, adds the key to the Ganado array, and
+ * then calls the registrarUsuario function to add the Ganado to the Usuario collection
+ * @param {string} ubicacion - string, genero: string, raza: string, tamano : string, precio: u64 = 0
+ * @param {string} genero - string, raza: string, tamano : string, precio: u64 = 0
+ * @param {string} raza - The breed of the animal
+ * @param {string} tamano - string, precio: u64 = 0
+ * @param {u64} [precio=0] - u64 = 0
+ * @returns the object ganado.
+ */
 export function registrarGanado(ubicacion: string, genero: string, raza: string, tamano : string, precio: u64 = 0): Ganado{
 
   //Validamos que los parámetros enviados sean correctos
-
-  /* Tecnicamente podría ir vacío, no hay ningún método que requiera el nombre.
-   * Sin embargo, dado a que esto será mostrado al usuario, es mejor que 
-   * desde el inicio se tenga asignado el nombre.
-   */
   assert(ubicacion != "", "La ubicacion no puede estar vacío.");
   
   assert(genero != "", "El genero puede estar vacío.");
@@ -59,6 +64,13 @@ export function registrarGanado(ubicacion: string, genero: string, raza: string,
 
 }
 
+/**
+ * It takes an idCuenta and an idGanado, and if the idCuenta is not already in the usuarios Map, it
+ * creates a new Usuario object with the idCuenta, and then adds the idGanado to the ganadoRegistrado
+ * array of the Usuario object
+ * @param {string} idCuenta - string
+ * @param {string} idGanado - string
+ */
 export function registrarUsuario(idCuenta: string, idGanado: string): void{
 
   let usuario = usuarios.get(idCuenta);
@@ -69,6 +81,14 @@ export function registrarUsuario(idCuenta: string, idGanado: string): void{
   usuarios.set(idCuenta, usuario);
 }
 
+/**
+ * The function takes in a string, a string, a string, and a string, and returns an Estado or null
+ * @param {string} idGanado - The ID of the animal.
+ * @param {string} descripcion - string
+ * @param {string} responsable - string
+ * @param {string} ubicacion - string
+ * @returns the new state of the animal.
+ */
 export function actualizarEstado(idGanado: string, descripcion: string, responsable: string, ubicacion: string): Estado | null{
 
   //Validando inputs
@@ -98,6 +118,12 @@ export function actualizarEstado(idGanado: string, descripcion: string, responsa
 
 }
 
+/**
+ * We're going to create a new array of type Estado, and then we're going to loop through the list of
+ * Estados, and push each one into the new array.
+ * @param {string} idGanado - string
+ * @returns An array of Estado objects.
+ */
 export function consultarEstados(idGanado: string): Array<Estado> | null {
 
   //Validamos inputs
@@ -132,6 +158,11 @@ export function consultarGanado(idGanado: string): Ganado | null {
   return ganados.get(idGanado);
 }
 
+/**
+ * It returns an array of Ganado objects or null if the user doesn't have any registered cattle
+ * @param {string} idCuenta - string = context.sender
+ * @returns An array of Ganado objects or null.
+ */
 export function consultarGanadoRegistrado(idCuenta: string = context.sender): Array<Ganado | null> | null{
   const usuario = usuarios.get(idCuenta);
   assert(usuario,"No tienes ganado registrado.");
@@ -152,6 +183,10 @@ export function buscarGanado(listaGanado: Array<string>): Array<Ganado | null> |
   return result;
 }
 
+/**
+ * The function comprarGanado() is used to buy a cow.
+ * @param {string} idGanado - The ID of the animal you want to buy.
+ */
 export function comprarGanado(idGanado:string): void {
 
   assert(idGanado != "", "El id no debe estar vacío.");
@@ -187,7 +222,7 @@ export function comprarGanado(idGanado:string): void {
 
       registrarUsuario(cuenta, idGanado);
 
-      logging.log(`Compra relizada con exito. El vendedor ha recibido supago de ${ganado.precio} NEAR.`);
+      logging.log(`Compra relizada con exito. El vendedor ha recibido su pago de ${ganado.precio} NEAR.`);
 
    }
 
