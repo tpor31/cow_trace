@@ -1,7 +1,8 @@
-import { storage, Context, VMContext } from 'near-sdk-as'
+import { storage, Context, VMContext, context } from 'near-sdk-as'
 import { registrarGanado } from '..'
 import * as contrato from "../index";
 import { ganados } from "../../models/model";
+import { Ganado } from '../model';
 
 
 const ID = "123";
@@ -51,3 +52,15 @@ it("Requiere que la ubicacion no sea vacia.", () => {
       contrato.registrarGanado(UBICACION, GENERO, "", TAMANO, PRECIO);
     }).toThrow("La raza no puede ser vacia.");
   })
+
+  
+
+describe("actualizar estado ", () => {
+    it("Requiere que exista un ganado con el id", () => {
+        setContext();
+      expect(() => {
+        contrato.actualizarEstado("1", "desc","resp","ubi");
+      }).toThrow("No existe un ganado con ese id ")
+    });
+  })
+  
