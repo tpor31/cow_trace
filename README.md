@@ -122,8 +122,8 @@ near call $CONTRATO actualizarEstado '{"idGanado":"id", "descripcion":"descripci
 ```
 
 
-### 5 Mockup interfaz grafica
+### 5 Interfaz grafica
 ===============
 
+![Imagen1](https://user-images.githubusercontent.com/54729133/171941135-7255c66a-8d7c-454b-a894-80156dda9730.jpg)
 
-https://docs.google.com/presentation/d/15CG_UGXPMSCpc9r2ExBDVibX9pCPzhPxzKSbEJhsL-8/edit?usp=sharing
